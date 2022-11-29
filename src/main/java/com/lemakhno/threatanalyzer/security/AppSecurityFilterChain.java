@@ -5,26 +5,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 @Configuration
 public class AppSecurityFilterChain {
 
     @Autowired
-    private OncePerRequestFilter threatAnalyzerFilter;
+    private ThreatAnalyzerFilter threatAnalyzerFilter;
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-
+        
         httpSecurity
             .formLogin();
-
-        httpSecurity
-            .csrf()
-            .disable();
-
+        
         /*
         httpSecurity
             .csrf()
@@ -37,9 +31,8 @@ public class AppSecurityFilterChain {
                 .anyRequest()
                 .authenticated();
 
-        
         httpSecurity
-        .addFilterBefore(threatAnalyzerFilter, UsernamePasswordAuthenticationFilter.class); // Or UsernamePasswordAuthenticationFilter
+            .addFilterBefore(threatAnalyzerFilter, SecurityContextHolderFilter.class);
 
         return httpSecurity.build();
     }
