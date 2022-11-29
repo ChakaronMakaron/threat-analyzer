@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class AppSecurityFilterChain {
@@ -19,12 +19,18 @@ public class AppSecurityFilterChain {
         httpSecurity
             .formLogin();
         
+        httpSecurity
+            .authorizeRequests()
+                .antMatchers("/css/**", "/js/**", "/images/**")
+                .permitAll();
         /*
         httpSecurity
             .csrf()
                 .ignoringAntMatchers("/api/login")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
         */
+
+        // httpSecurity.csrf().disable();
         
         httpSecurity
             .authorizeRequests()
@@ -32,7 +38,7 @@ public class AppSecurityFilterChain {
                 .authenticated();
 
         httpSecurity
-            .addFilterBefore(threatAnalyzerFilter, SecurityContextHolderFilter.class);
+            .addFilterAfter(threatAnalyzerFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

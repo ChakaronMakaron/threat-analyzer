@@ -2,12 +2,12 @@ package com.lemakhno.threatanalyzer.security;
 
 import static com.lemakhno.threatanalyzer.utils.AppUtils.formDataToMap;
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
-import static java.util.Objects.isNull;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -41,16 +41,16 @@ public class ThreatAnalyzerFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         logger.info("-- Threat analysis --");
 
+        String sourceHost = request.getHeader("Host");
+        String endpoint = request.getContextPath().isBlank() ? "/" : request.getContextPath();
+        logger.info("Request from host: {}, endpoint: {}, method: {}", sourceHost, endpoint, request.getMethod());
+        
         boolean isBodyContainedMethod = List.of(POST.name(), PUT.name(), PATCH.name(), DELETE.name()).contains(request.getMethod());
         boolean containsBody = isBodyContainedMethod && !List.of(-1, 0).contains(request.getContentLength());
-
+        
         Map<String, String> body = formDataToMap(request.getReader());
 
-        String sourceHost = request.getHeader("Host");
-        String endPoint = request.getContextPath();
-        logger.info("Request from host: {}, endpoint: {}", sourceHost, endPoint);
-
-        if (isBodyContainedMethod && Constants.IS_CSRF_ENABLED) {
+        if (Constants.IS_CSRF_ENABLED && isBodyContainedMethod) {
             logger.info("CSRF violation check");
             if (isNull(body.get("_csrf"))) {
                 logger.info("CSRF violation");
@@ -58,9 +58,9 @@ public class ThreatAnalyzerFilter extends OncePerRequestFilter {
                     .setType(Threats.CSRF.getTypeDescription())
                     .setSourceHost(sourceHost)
                     .setDateTime(LocalDateTime.now())
-                    .setDetails("Endpoint: " + endPoint + ", method: " + request.getMethod());
+                    .setDetails("Endpoint: " + endpoint + ", method: " + request.getMethod());
                 ThreatEntity savedThreatEntity = threatRepository.save(threatEntity);
-                logger.info("CORS violation threat record id: {}", savedThreatEntity.getId());
+                logger.info("CSRF violation threat record id: {}", savedThreatEntity.getId());
             }
         }
         
@@ -71,7 +71,7 @@ public class ThreatAnalyzerFilter extends OncePerRequestFilter {
                 .setType(Threats.CORS.getTypeDescription())
                 .setSourceHost(sourceHost)
                 .setDateTime(LocalDateTime.now())
-                .setDetails("Endpoint: " + endPoint + ", method: " + request.getMethod());
+                .setDetails("Endpoint: " + endpoint + ", method: " + request.getMethod());
             ThreatEntity savedThreatEntity = threatRepository.save(threatEntity);
             logger.info("CORS violation threat record id: {}", savedThreatEntity.getId());
         }

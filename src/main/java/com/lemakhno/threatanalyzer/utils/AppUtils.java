@@ -7,7 +7,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AppUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(AppUtils.class);
     
     public static Map<String, String> formDataToMap(BufferedReader reader) {
         Map<String, String> resultMap = new HashMap<>();
@@ -17,15 +22,14 @@ public class AppUtils {
             while (nonNull(line = reader.readLine())) {
                 data += line;
             }
-            Arrays.asList(data.split("&")).forEach(item -> {
-                String[] keyValue = item.split("=");
-                resultMap.put(keyValue[0], keyValue[1]);
-            });
-        } catch (Exception exception) {}
-        finally {
-            try {
-                reader.close();
-            } catch (Exception e) {}
+            if (!data.isEmpty()) {
+                Arrays.asList(data.split("&")).forEach(item -> {
+                    String[] keyValue = item.split("=");
+                    resultMap.put(keyValue[0], keyValue[1]);
+                });
+            }
+        } catch (Exception exception) {
+            logger.info("EXCEPTION >>> {}", exception.getMessage());
         }
         return resultMap;
     }
