@@ -21,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.lemakhno.threatanalyzer.analyzer.ThreatAnalyzer;
 import com.lemakhno.threatanalyzer.model.RequestDetails;
+import com.lemakhno.threatanalyzer.security.servlet.wrapper.CachedBodyHttpServletRequest;
 
 @Component
 public class ThreatAnalyzerFilter extends OncePerRequestFilter {
@@ -34,6 +35,8 @@ public class ThreatAnalyzerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         logger.info("-- Threat analysis --");
+
+        CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
         
         RequestDetails requestDetails = new RequestDetails()
             .setEndpoint(request.getContextPath())
@@ -49,6 +52,6 @@ public class ThreatAnalyzerFilter extends OncePerRequestFilter {
         threatAnalyzer.corsCheck(requestDetails);
         
         logger.info("-- Threat analysis end --");
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(cachedRequest, response);
     }
 }
