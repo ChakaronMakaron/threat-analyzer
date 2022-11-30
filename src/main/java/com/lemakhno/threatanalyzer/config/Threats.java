@@ -1,4 +1,4 @@
-package com.lemakhno.threatanalyzer.security;
+package com.lemakhno.threatanalyzer.config;
 
 public enum Threats {
 

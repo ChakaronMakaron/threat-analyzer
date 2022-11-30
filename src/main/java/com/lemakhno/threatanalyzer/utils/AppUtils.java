@@ -1,14 +1,20 @@
 package com.lemakhno.threatanalyzer.utils;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import java.io.BufferedReader;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.lemakhno.threatanalyzer.model.RequestDetails;
 
 public class AppUtils {
 
@@ -32,5 +38,32 @@ public class AppUtils {
             logger.info("EXCEPTION >>> {}", exception.getMessage());
         }
         return resultMap;
+    }
+
+    public static Map<String, String> objectToMap(Object object) {
+        Map<String, String> resultMap = new HashMap<>();
+        try {
+            for (Field field : object.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                Object fieldValue = field.get(object);
+                resultMap.put(field.getName(), isNull(fieldValue) ? null : fieldValue.toString());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        return resultMap;
+    }
+
+    public static RequestDetails getRequestDetails(HttpServletRequest request) {
+        return new RequestDetails()
+            .setEndpoint(request.getContextPath().isEmpty() ? "/" : request.getContextPath())
+            .setSourceHost(isNullOrBlank(request.getHeader("Host")) ? null : request.getHeader("Host"))
+            .setMethod(request.getMethod());
+    }
+
+    public static boolean isNullOrBlank(String string) {
+        if (string == null) return true;
+        if (string.isEmpty()) return true;
+        return false;
     }
 }
