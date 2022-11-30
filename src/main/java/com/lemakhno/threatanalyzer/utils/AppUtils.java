@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -56,8 +57,8 @@ public class AppUtils {
 
     public static RequestDetails getRequestDetails(HttpServletRequest request) {
         return new RequestDetails()
-            .setEndpoint(request.getContextPath().isEmpty() ? "/" : request.getContextPath())
-            .setSourceHost(isNullOrBlank(request.getHeader("Host")) ? null : request.getHeader("Host"))
+            .setEndpoint(request.getRequestURI())
+            .setSourceHost(isNullOrBlank(request.getHeader("Host")) ? "Caller address unavailable" : request.getHeader("Host"))
             .setMethod(request.getMethod());
     }
 
@@ -65,5 +66,13 @@ public class AppUtils {
         if (string == null) return true;
         if (string.isEmpty()) return true;
         return false;
+    }
+
+    public static String cookiesToString(Cookie[] cookies) {
+        String result = "";
+        for (Cookie cookie : cookies) {
+            result += String.format("{%s=%s}", cookie.getName(), cookie.getValue());
+        }
+        return result.isBlank() ? "No cookies" : result;
     }
 }

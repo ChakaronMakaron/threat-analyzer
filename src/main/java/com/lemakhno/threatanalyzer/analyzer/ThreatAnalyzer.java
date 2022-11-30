@@ -1,6 +1,7 @@
 package com.lemakhno.threatanalyzer.analyzer;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
 import java.time.LocalDateTime;
@@ -40,8 +41,7 @@ public class ThreatAnalyzer {
         }
     }
 
-    public void sqlInjectionCheck(RequestDetails requestDetails, Object object) {
-        Map<String, String> body = AppUtils.objectToMap(object);
+    public void sqlInjectionCheck(RequestDetails requestDetails, Map<String, String> body) {
         logger.info("SQL injection check");
         if (!body.isEmpty()) {
             logger.info("Body: {}", body);
@@ -64,5 +64,24 @@ public class ThreatAnalyzer {
                 logger.info("SQL injection threat record id: {}", savedThreatEntity.getId());
             }
         }
+    }
+
+    public void csrfCheck(RequestDetails requestDetails) {
+        logger.info("CSRF violation check: X-XSRF-TOKEN header = {}", requestDetails.getCsrfHeader());
+        
+        if (isNull(requestDetails.getCsrfHeader())) {
+            logger.info("CSRF violation");
+            ThreatEntity threatEntity = new ThreatEntity()
+                .setDateTime(LocalDateTime.now())
+                .setType(Threats.CSRF.getTypeDescription())
+                .setDetails("Method: " + requestDetails.getMethod())
+                .setSourceHost(requestDetails.getSourceHost());
+            ThreatEntity savedThreatEntity = threatRepository.save(threatEntity);
+            logger.info("CSRF threat record id: {}", savedThreatEntity.getId());
+        }
+    }
+
+    public void sqlInjectionCheck(RequestDetails requestDetails, Object object) {
+        sqlInjectionCheck(requestDetails, AppUtils.objectToMap(object));
     }
 }

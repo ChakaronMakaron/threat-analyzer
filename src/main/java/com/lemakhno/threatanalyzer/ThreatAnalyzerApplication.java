@@ -9,5 +9,4 @@ public class ThreatAnalyzerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ThreatAnalyzerApplication.class, args);
 	}
-
 }

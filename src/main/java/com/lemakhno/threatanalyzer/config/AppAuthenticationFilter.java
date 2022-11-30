@@ -20,7 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lemakhno.threatanalyzer.analyzer.ThreatAnalyzer;
 import com.lemakhno.threatanalyzer.model.AuthenticationRequest;
 import com.lemakhno.threatanalyzer.model.RequestDetails;
 
@@ -32,8 +31,10 @@ public class AppAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Autowired
     private ObjectMapper objectMapper;
 
+    /*
     @Autowired
     private ThreatAnalyzer threatAnalyzer;
+    */
 
     public AppAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.setAuthenticationManager(authenticationManager);
@@ -55,8 +56,10 @@ public class AppAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             logger.info("Authentication body: {}", authenticationRequest);
 
+            /*
             threatAnalyzer.corsCheck(requestDetails);
             threatAnalyzer.sqlInjectionCheck(requestDetails, authenticationRequest);
+            */
 
             UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
