@@ -22,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.lemakhno.threatanalyzer.analyzer.ThreatAnalyzer;
 import com.lemakhno.threatanalyzer.model.RequestDetails;
 import com.lemakhno.threatanalyzer.security.servlet.wrapper.CachedBodyHttpServletRequest;
+import com.lemakhno.threatanalyzer.utils.AppUtils;
 
 @Component
 public class ThreatAnalyzerFilter extends OncePerRequestFilter {
@@ -39,7 +40,7 @@ public class ThreatAnalyzerFilter extends OncePerRequestFilter {
         CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
         
         RequestDetails requestDetails = new RequestDetails()
-            .setEndpoint(request.getContextPath())
+            .setEndpoint(request.getRequestURI())
             .setMethod(request.getMethod())
             .setSourceHost(request.getHeader("Host").isEmpty() ? "Caller address unavailable" : request.getHeader("Host"));
         
