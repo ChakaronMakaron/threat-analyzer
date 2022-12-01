@@ -6,6 +6,7 @@ public class Constants {
     
     public static final List<String> ALLOWED_HOSTS = List.of("localhost:8080", "http://front.end");
     public static final boolean IS_CSRF_ENABLED = true;
+    public static final int ALLOWED_REQUESTS_PER_SECOND = 2;
     public static final List<String> SQL_KEYWORDS = List.of(
         "ADD", "CONSTRAINT", "ALL", "ALTER", "COLUMN", "TABLE",
         "AND", "ANY", "AS", "ASC", "BACKUP", "DATABASE", "BETWEEN",

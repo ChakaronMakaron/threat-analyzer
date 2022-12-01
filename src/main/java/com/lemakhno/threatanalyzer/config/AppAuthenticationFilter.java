@@ -5,6 +5,7 @@ import static com.lemakhno.threatanalyzer.utils.AppUtils.getRequestDetails;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,6 +82,20 @@ public class AppAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         response.setContentType("application/json");
         response.setStatus(401);
+
+        objectMapper.writeValue(response.getOutputStream(), responseBody);
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+            Authentication authentication) throws IOException, ServletException {
+
+        logger.info("-- Successful authentication --");
+
+        Map<String, String> responseBody = Map.of("message", "Successful authentication");
+
+        response.setContentType("application/json");
+        response.setStatus(200);
 
         objectMapper.writeValue(response.getOutputStream(), responseBody);
     }

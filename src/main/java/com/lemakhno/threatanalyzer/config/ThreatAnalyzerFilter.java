@@ -22,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lemakhno.threatanalyzer.analyzer.BruteForceDetector;
 import com.lemakhno.threatanalyzer.analyzer.ThreatAnalyzer;
 import com.lemakhno.threatanalyzer.model.RequestDetails;
 import com.lemakhno.threatanalyzer.security.servlet.wrapper.CachedBodyHttpServletRequest;
@@ -32,6 +33,9 @@ public class ThreatAnalyzerFilter extends OncePerRequestFilter {
 
     @Autowired
     private ThreatAnalyzer threatAnalyzer;
+
+    @Autowired
+    private BruteForceDetector bruteForceDetector;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -66,6 +70,9 @@ public class ThreatAnalyzerFilter extends OncePerRequestFilter {
                 new TypeReference<Map<String, String>>() {}));
         if (isBodyContainedMethod && Constants.IS_CSRF_ENABLED)
             threatAnalyzer.csrfCheck(requestDetails);
+        
+        logger.info("Brute force check");
+        bruteForceDetector.check(requestDetails);
         
         logger.info("-- Threat analysis end --");
         logger.info("#########################");
