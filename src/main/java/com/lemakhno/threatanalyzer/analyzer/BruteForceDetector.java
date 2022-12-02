@@ -68,7 +68,7 @@ public class BruteForceDetector {
                 .setDateTime(dateTimeNow)
                 .setType(Threats.BRUTE_FORCE.getTypeDescription())
                 .setSourceHost(requestDetails.getSourceHost())
-                .setDetails("Endpoint: " + requestDetails.getEndpoint() + ", Method: " + requestDetails.getMethod() + ", RPS: " + requestsOverLastSecond);
+                .setDetails("Endpoint: " + requestDetails.getEndpoint() + ", Method: " + requestDetails.getMethod());
             ThreatEntity savedThreatEntity = threatRepository.save(threatEntity);
             logger.info("New brute force threat record: {}", savedThreatEntity.getId());
             hostRequestHistory.clear();
